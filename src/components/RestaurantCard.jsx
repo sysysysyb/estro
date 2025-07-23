@@ -2,16 +2,13 @@ import { Box, Button, ButtonGroup, Card, Flex, Image } from '@chakra-ui/react';
 import { IoMdHeart } from 'react-icons/io';
 import { IoMdHeartDislike } from 'react-icons/io';
 
-function RestaurantCard({ label }) {
+function RestaurantCard({ title, image, label }) {
   return (
     <Card.Root>
       <Flex direction="column" align="center">
-        <Image
-          src="https://cdn.pixabay.com/photo/2021/07/20/06/04/restaurant-6479818_960_720.jpg"
-          alt="example"
-        />
+        <Image aspectRatio={4 / 3} src={`http://localhost:3000/${image.src}`} alt={image.alt} />
         <Card.Body>
-          <Card.Title>Example Restaurant</Card.Title>
+          <Card.Title>{title}</Card.Title>
         </Card.Body>
         <Card.Footer>
           {label === 'home' ? (
