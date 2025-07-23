@@ -7,6 +7,7 @@ function App() {
     <Routes>
       <Route path="/" element={<Layout />}>
         <Route index element={<Home />} />
+        <Route path="/favorites" element={<div>Favorites 페이지</div>} />
       </Route>
     </Routes>
   );

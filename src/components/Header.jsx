@@ -7,8 +7,8 @@ function Header() {
         <Flex gap="6">
           <Heading size="2xl">ESTRO</Heading>
           <Flex gap="3">
-            <Link>Home</Link>
-            <Link>Favorites</Link>
+            <Link href="/">Home</Link>
+            <Link href="/favorites">Favorites</Link>
           </Flex>
         </Flex>
         <Avatar.Root>
