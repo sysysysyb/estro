@@ -1,5 +1,15 @@
 import RestaurantCard from '@/components/RestaurantCard';
-import { Box, Center, EmptyState, Flex, Grid, Heading, Input, InputGroup } from '@chakra-ui/react';
+import {
+  Box,
+  Center,
+  EmptyState,
+  Flex,
+  Grid,
+  Heading,
+  Input,
+  InputGroup,
+  ProgressCircle,
+} from '@chakra-ui/react';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { LuSearch } from 'react-icons/lu';
@@ -7,25 +17,32 @@ import { IoMdRestaurant } from 'react-icons/io';
 
 function Main({ label }) {
   const [places, setPlaces] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (label === 'home') {
       const fetchAllPlaces = async () => {
         try {
+          setLoading(true);
           const response = await axios.get('http://localhost:3000/places');
           setPlaces(response.data.places);
         } catch (err) {
           console.error('전체 데이터 로드 실패', err);
+        } finally {
+          setLoading(false);
         }
       };
       fetchAllPlaces();
     } else {
       const fetchFavoritesPlaces = async () => {
         try {
+          setLoading(true);
           const response = await axios.get('http://localhost:3000/users/places');
           setPlaces(response.data);
         } catch (err) {
           console.error('좋아요 데이터 로드 실패', err);
+        } finally {
+          setLoading(false);
         }
         fetchFavoritesPlaces();
       };
@@ -51,7 +68,16 @@ function Main({ label }) {
               </InputGroup>
             )}
           </Flex>
-          {places.length > 0 ? (
+          {loading ? (
+            <Center>
+              <ProgressCircle.Root value={null} size="md">
+                <ProgressCircle.Circle>
+                  <ProgressCircle.Track />
+                  <ProgressCircle.Range />
+                </ProgressCircle.Circle>
+              </ProgressCircle.Root>
+            </Center>
+          ) : places.length > 0 ? (
             <Grid templateColumns="repeat(3, 1fr)" gap="4">
               {places.map(({ id, title, image }) => (
                 <RestaurantCard key={id} title={title} image={image} label={label} />
@@ -63,7 +89,7 @@ function Main({ label }) {
                 <EmptyState.Indicator>
                   <IoMdRestaurant />
                 </EmptyState.Indicator>
-                <EmptyState.Title>Your favorites is empty</EmptyState.Title>
+                <EmptyState.Title>{label} is empty</EmptyState.Title>
                 <EmptyState.Description>
                   Add new places into your favorite places list
                 </EmptyState.Description>
