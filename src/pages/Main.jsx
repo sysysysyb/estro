@@ -9,6 +9,7 @@ import {
   Input,
   InputGroup,
   ProgressCircle,
+  Text,
 } from '@chakra-ui/react';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
@@ -18,6 +19,7 @@ import { IoMdRestaurant } from 'react-icons/io';
 function Main({ label }) {
   const [places, setPlaces] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     if (label === 'home') {
@@ -26,7 +28,9 @@ function Main({ label }) {
           setLoading(true);
           const response = await axios.get('http://localhost:3000/places');
           setPlaces(response.data.places);
+          setError(null);
         } catch (err) {
+          setError(err.response);
           console.error('전체 데이터 로드 실패', err);
         } finally {
           setLoading(false);
@@ -39,21 +43,38 @@ function Main({ label }) {
           setLoading(true);
           const response = await axios.get('http://localhost:3000/users/places');
           setPlaces(response.data);
+          setError(null);
         } catch (err) {
+          setError(err.response);
           console.error('좋아요 데이터 로드 실패', err);
         } finally {
           setLoading(false);
         }
-        fetchFavoritesPlaces();
       };
+      fetchFavoritesPlaces();
     }
   }, [label]);
 
   console.log(places);
 
+  if (error)
+    return (
+      <Flex justify="center" align="center" w="100%" h="100%">
+        <Box width="50%" colorPalette="red" bg="colorPalette.300" p="10" textAlign="center">
+          <Flex direction="column" gap="5">
+            <Heading>❌ Error 발생!</Heading>
+            <Flex direction="column" gap="2">
+              <Text>에러 코드 : {error.status}</Text>
+              <Text>에러 메시지 : {error.data.message}</Text>
+            </Flex>
+          </Flex>
+        </Box>
+      </Flex>
+    );
+
   return (
     <Center>
-      <Box width="75%" py="10">
+      <Box w="75%" py="10">
         <Flex direction="column" gap="12">
           <Flex direction="column" gap="4">
             <Heading size="3xl">{label === 'home' ? 'All Restaurants' : 'My Favorites'}</Heading>
