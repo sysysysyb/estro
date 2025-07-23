@@ -87,6 +87,7 @@ function Main({ label }) {
       </Flex>
     );
 
+  // @todo - home일 때와 favorites 일 때 loading 이후 구분 업데이트하기
   return (
     <Center>
       <Box w="75%" py="10">
