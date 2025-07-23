@@ -4,7 +4,7 @@ import { Outlet } from 'react-router';
 
 function Layout() {
   return (
-    <Box bg="#fcfaf7" minHeight="100vh">
+    <Box bg="#FCFBF8" minHeight="100vh">
       <Header />
       <Outlet />
       {/* Footer */}
