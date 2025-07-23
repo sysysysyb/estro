@@ -11,52 +11,66 @@ import {
   ProgressCircle,
   Text,
 } from '@chakra-ui/react';
-import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { LuSearch } from 'react-icons/lu';
 import { IoMdRestaurant } from 'react-icons/io';
 import { getAllPlaces, getFavoritesPlaces } from '@/apis';
+import { getCurrentPosition } from '@/utils/getCurrentPostion';
+import { toaster } from '@/components/ui/toaster';
+import { sortPlacesByDistance } from '@/utils/sortPlaces';
 
 function Main({ label }) {
   const [places, setPlaces] = useState([]);
+  const [coords, setCoords] = useState({ latitude: null, longitude: null });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (label === 'home') {
-      const fetchAllPlaces = async () => {
-        try {
-          setLoading(true);
-          const data = await getAllPlaces();
-          setPlaces(data);
-          setError(null);
-        } catch (error) {
-          setError(error);
-          console.error('전체 데이터 로드 실패', err);
-        } finally {
-          setLoading(false);
-        }
-      };
-      fetchAllPlaces();
-    } else {
-      const fetchFavoritesPlaces = async () => {
-        try {
-          setLoading(true);
-          const data = await getFavoritesPlaces();
-          setPlaces(data);
-          setError(null);
-        } catch (error) {
-          setError(error);
-          console.error('좋아요 데이터 로드 실패', err);
-        } finally {
-          setLoading(false);
-        }
-      };
-      fetchFavoritesPlaces();
-    }
+    const fetchPlaces = async () => {
+      try {
+        setLoading(true);
+        const data = label === 'home' ? await getAllPlaces() : await getFavoritesPlaces();
+        setPlaces(data);
+        setError(null);
+      } catch (error) {
+        setError(error);
+        console.error('전체 데이터 로드 실패', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPlaces();
   }, [label]);
 
-  console.log(places);
+  useEffect(() => {
+    if (label === 'home' && places) {
+      getCurrentPosition({
+        enableHighAccuracy: true,
+        timeout: 5000,
+        maximumAge: 0,
+      })
+        .then((position) => {
+          setCoords({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          });
+        })
+        .catch((err) => {
+          toaster.create({
+            title: '위치 정보 로드 실패',
+            description: err.message,
+            type: 'error',
+            duration: 5000,
+            isClosable: true,
+          });
+        });
+    }
+  }, [label, places]);
+
+  const sortedPlaces = sortPlacesByDistance(places, coords.latitude, coords.longitude);
+
+  // console.log(coords);
+  // console.log(sortedPlaces);
 
   if (error)
     return (
@@ -99,9 +113,9 @@ function Main({ label }) {
                 </ProgressCircle.Circle>
               </ProgressCircle.Root>
             </Center>
-          ) : places.length > 0 ? (
+          ) : sortedPlaces.length > 0 ? (
             <Grid templateColumns="repeat(3, 1fr)" gap="4">
-              {places.map(({ id, title, image }) => (
+              {sortedPlaces.map(({ id, title, image }) => (
                 <RestaurantCard key={id} title={title} image={image} label={label} />
               ))}
             </Grid>
