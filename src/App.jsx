@@ -1,5 +1,15 @@
+import { Route, Routes } from 'react-router';
+import Layout from '@layouts/Layout';
+import Home from '@pages/Home';
+
 function App() {
-  return <div>App</div>;
+  return (
+    <Routes>
+      <Route path="/" element={<Layout />}>
+        <Route index element={<Home />} />
+      </Route>
+    </Routes>
+  );
 }
 
 export default App;
