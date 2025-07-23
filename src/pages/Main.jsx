@@ -15,6 +15,7 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { LuSearch } from 'react-icons/lu';
 import { IoMdRestaurant } from 'react-icons/io';
+import { getAllPlaces, getFavoritesPlaces } from '@/apis';
 
 function Main({ label }) {
   const [places, setPlaces] = useState([]);
@@ -26,11 +27,11 @@ function Main({ label }) {
       const fetchAllPlaces = async () => {
         try {
           setLoading(true);
-          const response = await axios.get('http://localhost:3000/places');
-          setPlaces(response.data.places);
+          const data = await getAllPlaces();
+          setPlaces(data);
           setError(null);
-        } catch (err) {
-          setError(err.response);
+        } catch (error) {
+          setError(error);
           console.error('전체 데이터 로드 실패', err);
         } finally {
           setLoading(false);
@@ -41,11 +42,11 @@ function Main({ label }) {
       const fetchFavoritesPlaces = async () => {
         try {
           setLoading(true);
-          const response = await axios.get('http://localhost:3000/users/places');
-          setPlaces(response.data);
+          const data = await getFavoritesPlaces();
+          setPlaces(data);
           setError(null);
-        } catch (err) {
-          setError(err.response);
+        } catch (error) {
+          setError(error);
           console.error('좋아요 데이터 로드 실패', err);
         } finally {
           setLoading(false);
