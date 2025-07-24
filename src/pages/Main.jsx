@@ -1,7 +1,7 @@
 import { Box, Center, Flex, Heading, Input, InputGroup } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 import { LuSearch } from 'react-icons/lu';
-import { getAllPlaces, getFavoritesPlaces } from '@/apis';
+import { getAllPlaces, getFavoritesPlaces, removeFavoritesPlace } from '@/apis';
 import { getCurrentPosition } from '@/utils/getCurrentPostion';
 import { sortPlacesByDistance } from '@/utils/sortPlaces';
 import { showToaster } from '@/utils/showToaster';
@@ -14,6 +14,19 @@ function Main({ label }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const handleFavoriteRemove = async (favId) => {
+    try {
+      const data = await removeFavoritesPlace(favId);
+      console.log(data);
+      const filteredData = places.filter((el) => el.id !== favId);
+      setPlaces(filteredData);
+      showToaster({ description: 'Favorites 맛집 삭제하기 성공 😉', type: 'success' });
+    } catch (error) {
+      console.error('Favorites 삭제 실패', error);
+      showToaster({ description: 'Favorites 삭제 실패 🙄', type: 'error' });
+    }
+  };
+
   useEffect(() => {
     const fetchPlaces = async () => {
       try {
@@ -25,7 +38,6 @@ function Main({ label }) {
         } else {
           const data = await getFavoritesPlaces();
           showToaster({ description: '좋아요 데이터 불러오기 성공 😍', type: 'success' });
-          console.log('favorites : ', data);
           setPlaces(data);
         }
         setError(null);
@@ -71,7 +83,7 @@ function Main({ label }) {
 
   // console.log(places);
   // console.log(coords);
-  console.log(sortedPlaces);
+  // console.log(sortedPlaces);
 
   return (
     <Center>
@@ -95,6 +107,7 @@ function Main({ label }) {
             label={label}
             loading={loading}
             error={error}
+            handleFavoriteRemove={handleFavoriteRemove}
           />
         </Flex>
       </Box>
