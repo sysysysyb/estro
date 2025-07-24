@@ -1,20 +1,7 @@
-import RestaurantCard from '@/components/RestaurantCard';
-import {
-  Box,
-  Center,
-  EmptyState,
-  Flex,
-  Grid,
-  Heading,
-  Input,
-  InputGroup,
-  ProgressCircle,
-  Text,
-} from '@chakra-ui/react';
+import { Box, Center, Flex, Heading, Input, InputGroup } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 import { LuSearch } from 'react-icons/lu';
-import { IoMdRestaurant } from 'react-icons/io';
-import { addFavoritesPlace, getAllPlaces, getFavoritesPlaces } from '@/apis';
+import { getAllPlaces, getFavoritesPlaces } from '@/apis';
 import { getCurrentPosition } from '@/utils/getCurrentPostion';
 import { sortPlacesByDistance } from '@/utils/sortPlaces';
 import { showToaster } from '@/utils/showToaster';
@@ -26,18 +13,6 @@ function Main({ label }) {
   const [sortedPlaces, setSortedPlaces] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  const handleFavoriteAdd = async (favId) => {
-    try {
-      const favPlace = places.find((el) => el.id === favId);
-      console.log(favPlace);
-      const data = await addFavoritesPlace(favPlace);
-      showToaster({ description: 'Favorites에 맛집 저장하기 성공 😆', type: 'success' });
-    } catch (error) {
-      console.error('Favorites 저장 실패', error);
-      showToaster({ description: 'Favorites 저장 실패 🙄', type: 'error' });
-    }
-  };
 
   useEffect(() => {
     const fetchPlaces = async () => {
