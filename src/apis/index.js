@@ -7,7 +7,7 @@ export const getAllPlaces = async () => {
     const response = await axios.get(`${BASE_URL}/places`);
     return response.data.places;
   } catch (err) {
-    return err.response;
+    throw err.response;
   }
 };
 
