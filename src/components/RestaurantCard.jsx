@@ -1,8 +1,8 @@
-import { Box, Button, ButtonGroup, Card, Flex, Image } from '@chakra-ui/react';
+import { Button, Card, Flex, Image } from '@chakra-ui/react';
 import { IoMdHeart } from 'react-icons/io';
 import { IoMdHeartDislike } from 'react-icons/io';
 
-function RestaurantCard({ title, image, label }) {
+function RestaurantCard({ id, title, image, label, handleFavoriteAdd }) {
   return (
     <Card.Root>
       <Flex direction="column" align="center">
@@ -12,7 +12,7 @@ function RestaurantCard({ title, image, label }) {
         </Card.Body>
         <Card.Footer>
           {label === 'home' ? (
-            <Button colorPalette="yellow" variants="surface">
+            <Button colorPalette="yellow" variants="surface" onClick={() => handleFavoriteAdd(id)}>
               <IoMdHeart />
               Add Favorites
             </Button>
