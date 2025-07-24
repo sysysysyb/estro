@@ -1,23 +1,11 @@
-import RestaurantCard from '@/components/RestaurantCard';
-import {
-  Box,
-  Center,
-  EmptyState,
-  Flex,
-  Grid,
-  Heading,
-  Input,
-  InputGroup,
-  ProgressCircle,
-  Text,
-} from '@chakra-ui/react';
+import { Box, Center, Flex, Heading, Input, InputGroup } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 import { LuSearch } from 'react-icons/lu';
-import { IoMdRestaurant } from 'react-icons/io';
-import { getAllPlaces, getFavoritesPlaces } from '@/apis';
+import { getAllPlaces, getFavoritesPlaces, removeFavoritesPlace } from '@/apis';
 import { getCurrentPosition } from '@/utils/getCurrentPostion';
 import { sortPlacesByDistance } from '@/utils/sortPlaces';
 import { showToaster } from '@/utils/showToaster';
+import PlacesSection from '@/components/PlacesSection';
 
 function Main({ label }) {
   const [places, setPlaces] = useState([]);
@@ -25,6 +13,19 @@ function Main({ label }) {
   const [sortedPlaces, setSortedPlaces] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const handleFavoriteRemove = async (favId) => {
+    try {
+      const data = await removeFavoritesPlace(favId);
+      console.log(data);
+      const filteredData = places.filter((el) => el.id !== favId);
+      setPlaces(filteredData);
+      showToaster({ description: 'Favorites 맛집 삭제하기 성공 😉', type: 'success' });
+    } catch (error) {
+      console.error('Favorites 삭제 실패', error);
+      showToaster({ description: 'Favorites 삭제 실패 🙄', type: 'error' });
+    }
+  };
 
   useEffect(() => {
     const fetchPlaces = async () => {
@@ -84,21 +85,6 @@ function Main({ label }) {
   // console.log(coords);
   // console.log(sortedPlaces);
 
-  if (error)
-    return (
-      <Flex justify="center" align="center" w="100%" h="100%">
-        <Box width="50%" colorPalette="red" bg="colorPalette.300" p="10" textAlign="center">
-          <Flex direction="column" gap="5">
-            <Heading>❌ Error 발생!</Heading>
-            <Flex direction="column" gap="2">
-              <Text>에러 코드 : {error.status}</Text>
-              <Text>에러 메시지 : {error.data.message}</Text>
-            </Flex>
-          </Flex>
-        </Box>
-      </Flex>
-    );
-
   return (
     <Center>
       <Box w="75%" py="10">
@@ -116,34 +102,13 @@ function Main({ label }) {
               </InputGroup>
             )}
           </Flex>
-          {loading ? (
-            <Center>
-              <ProgressCircle.Root value={null} size="md">
-                <ProgressCircle.Circle>
-                  <ProgressCircle.Track />
-                  <ProgressCircle.Range />
-                </ProgressCircle.Circle>
-              </ProgressCircle.Root>
-            </Center>
-          ) : sortedPlaces.length > 0 ? (
-            <Grid templateColumns="repeat(3, 1fr)" gap="4">
-              {sortedPlaces.map(({ id, title, image }) => (
-                <RestaurantCard key={id} title={title} image={image} label={label} />
-              ))}
-            </Grid>
-          ) : (
-            <EmptyState.Root size="lg">
-              <EmptyState.Content>
-                <EmptyState.Indicator>
-                  <IoMdRestaurant />
-                </EmptyState.Indicator>
-                <EmptyState.Title>{label} is empty</EmptyState.Title>
-                <EmptyState.Description>
-                  Add new places into your favorite places list
-                </EmptyState.Description>
-              </EmptyState.Content>
-            </EmptyState.Root>
-          )}
+          <PlacesSection
+            placesData={label === 'home' ? sortedPlaces : places}
+            label={label}
+            loading={loading}
+            error={error}
+            handleFavoriteRemove={handleFavoriteRemove}
+          />
         </Flex>
       </Box>
     </Center>
