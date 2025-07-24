@@ -2,7 +2,7 @@ import { Button, Card, Flex, Image } from '@chakra-ui/react';
 import { IoMdHeart } from 'react-icons/io';
 import { IoMdHeartDislike } from 'react-icons/io';
 
-function RestaurantCard({ id, title, image, label, handleFavoriteAdd }) {
+function RestaurantCard({ id, title, image, label, handleFavoriteAdd, handleFavoriteRemove }) {
   return (
     <Card.Root>
       <Flex direction="column" align="center">
@@ -17,7 +17,7 @@ function RestaurantCard({ id, title, image, label, handleFavoriteAdd }) {
               Add Favorites
             </Button>
           ) : (
-            <Button colorPalette="red" variants="surface">
+            <Button colorPalette="red" variants="surface" onClick={() => handleFavoriteRemove(id)}>
               <IoMdHeartDislike />
               Remove
             </Button>

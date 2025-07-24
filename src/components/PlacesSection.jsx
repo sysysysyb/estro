@@ -13,7 +13,7 @@ import { IoMdRestaurant } from 'react-icons/io';
 import { addFavoritesPlace } from '@/apis';
 import { showToaster } from '@/utils/showToaster';
 
-function PlacesSection({ placesData, label, loading, error }) {
+function PlacesSection({ placesData, label, loading, error, handleFavoriteRemove }) {
   const handleFavoriteAdd = async (favId) => {
     try {
       const favPlace = placesData.find((el) => el.id === favId);
@@ -57,18 +57,23 @@ function PlacesSection({ placesData, label, loading, error }) {
   }
 
   if (placesData.length === 0) {
-    <EmptyState.Root size="lg">
-      <EmptyState.Content>
-        <EmptyState.Indicator>
-          <IoMdRestaurant />
-        </EmptyState.Indicator>
-        <EmptyState.Title>{label} is empty</EmptyState.Title>
-        <EmptyState.Description>
-          Add new places into your favorite places list
-        </EmptyState.Description>
-      </EmptyState.Content>
-    </EmptyState.Root>;
+    return (
+      <EmptyState.Root size="lg">
+        <EmptyState.Content>
+          <EmptyState.Indicator>
+            <IoMdRestaurant />
+          </EmptyState.Indicator>
+          <EmptyState.Title>{label} is empty</EmptyState.Title>
+          <EmptyState.Description>
+            Add new places into your favorite places list
+          </EmptyState.Description>
+        </EmptyState.Content>
+      </EmptyState.Root>
+    );
   }
+
+  console.log('placesData : ', placesData);
+  // console.log('filteredData : ', filteredData);
 
   return (
     <Grid templateColumns="repeat(3, 1fr)" gap="4">
@@ -80,6 +85,7 @@ function PlacesSection({ placesData, label, loading, error }) {
           image={image}
           label={label}
           handleFavoriteAdd={handleFavoriteAdd}
+          handleFavoriteRemove={handleFavoriteRemove}
         />
       ))}
     </Grid>
