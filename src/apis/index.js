@@ -36,3 +36,12 @@ export const addFavoritesPlace = async (place) => {
     throw err.response;
   }
 };
+
+export const removeFavoritesPlace = async (id) => {
+  try {
+    const response = await axios.delete(`${BASE_URL}/users/places/${id}`);
+    return response;
+  } catch (err) {
+    throw err.response;
+  }
+};
