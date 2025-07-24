@@ -4,7 +4,7 @@ export function showToaster({ description = '', type = 'info' }) {
   toaster.create({
     description: description,
     type: type,
-    duration: 5000,
+    duration: 4000,
     isClosable: true,
   });
 }
