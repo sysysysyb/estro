@@ -6,12 +6,12 @@ import { BrowserRouter } from 'react-router';
 import { Toaster } from './components/ui/toaster.jsx';
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <Provider>
-      <Toaster />
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    </Provider>
-  </StrictMode>
+  // <StrictMode>
+  <Provider>
+    <Toaster />
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+  </Provider>
+  // </StrictMode>
 );
