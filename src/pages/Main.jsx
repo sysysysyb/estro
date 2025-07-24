@@ -16,12 +16,13 @@ import { LuSearch } from 'react-icons/lu';
 import { IoMdRestaurant } from 'react-icons/io';
 import { getAllPlaces, getFavoritesPlaces } from '@/apis';
 import { getCurrentPosition } from '@/utils/getCurrentPostion';
-import { toaster } from '@/components/ui/toaster';
 import { sortPlacesByDistance } from '@/utils/sortPlaces';
+import { showToaster } from '@/utils/showToaster';
 
 function Main({ label }) {
   const [places, setPlaces] = useState([]);
   const [coords, setCoords] = useState({ latitude: null, longitude: null });
+  const [sortedPlaces, setSortedPlaces] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -29,13 +30,20 @@ function Main({ label }) {
     const fetchPlaces = async () => {
       try {
         setLoading(true);
-        const data = label === 'home' ? await getAllPlaces() : await getFavoritesPlaces();
-        setPlaces(data);
+        if (label === 'home') {
+          const data = await getAllPlaces();
+          showToaster({ description: '맛집 데이터 불러오기 성공 😋', type: 'success' });
+          setPlaces(data);
+        } else {
+          const data = await getFavoritesPlaces();
+          showToaster({ description: '좋아요 데이터 불러오기 성공 😍', type: 'success' });
+          setPlaces(data);
+        }
         setError(null);
       } catch (error) {
         setError(error);
-        console.error('전체 데이터 로드 실패', err);
-      } finally {
+        console.error('맛집 데이터 로드 실패', error);
+        showToaster({ description: '맛집 데이터 불러오기 실패 😥', type: 'error' });
         setLoading(false);
       }
     };
@@ -43,7 +51,7 @@ function Main({ label }) {
   }, [label]);
 
   useEffect(() => {
-    if (label === 'home' && places) {
+    if (label === 'home' && places.length > 0) {
       getCurrentPosition({
         enableHighAccuracy: true,
         timeout: 5000,
@@ -54,21 +62,25 @@ function Main({ label }) {
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
           });
+          showToaster({ description: '위치 데이터 불러오기 성공 😎', type: 'success' });
         })
         .catch((err) => {
-          toaster.create({
-            title: '위치 정보 로드 실패',
-            description: err.message,
-            type: 'error',
-            duration: 5000,
-            isClosable: true,
-          });
+          setError(error);
+          console.error('사용자 거리 로드 실패', err);
+          showToaster({ description: '위치 데이터 불러오기 실패 🙁', type: 'error' });
+          setLoading(false);
         });
     }
   }, [label, places]);
 
-  const sortedPlaces = sortPlacesByDistance(places, coords.latitude, coords.longitude);
+  useEffect(() => {
+    if (coords.latitude && coords.longitude) {
+      setSortedPlaces(sortPlacesByDistance(places, coords.latitude, coords.longitude));
+    }
+    setLoading(false);
+  }, [coords.latitude, coords.longitude]);
 
+  // console.log(places);
   // console.log(coords);
   // console.log(sortedPlaces);
 
@@ -87,7 +99,6 @@ function Main({ label }) {
       </Flex>
     );
 
-  // @todo - home일 때와 favorites 일 때 loading 이후 구분 업데이트하기
   return (
     <Center>
       <Box w="75%" py="10">
